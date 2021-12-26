@@ -1,4 +1,4 @@
-package ipca.combustivel.finalproject
+package ipca.project.rpglife
 
 import org.junit.Test
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ipca.combustivel.finalproject">
+    package="ipca.project.rpglife">
 
     <application
         android:allowBackup="true"
@@ -10,10 +10,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FinalProject">
         <activity
-            android:name=".MainActivity"
+            android:name="ipca.project.rpglife.MainActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginPage"
+            android:name="ipca.project.rpglife.LoginPage"
             android:exported="true"
             android:screenOrientation="portrait"
             >

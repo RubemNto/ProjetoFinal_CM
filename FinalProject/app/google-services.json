@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "45918074675",
+    "project_id": "rpg-life-db6ed",
+    "storage_bucket": "rpg-life-db6ed.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:45918074675:android:1fbe5e83213206d4997046",
+        "android_client_info": {
+          "package_name": "ipca.project.rpglife"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "45918074675-3ufhpmcsavi7g278mri87579a7featbg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB52ngb96fXwDp0fBF5nVJuRhlOoWRTiRw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "45918074675-3ufhpmcsavi7g278mri87579a7featbg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
