@@ -14,16 +14,16 @@ import com.google.firebase.ktx.Firebase
 class LoginPage : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
-    private lateinit var LogInButton: Button
+    private lateinit var SignInButton: Button
     private lateinit var RegisterButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
         setContentView(R.layout.activity_login_page)
-        LogInButton = findViewById(R.id.LogInButton)
+        SignInButton = findViewById(R.id.SignInButton)
         RegisterButton = findViewById(R.id.RegisterButton)
-        LogInButton.setOnClickListener {
+        SignInButton.setOnClickListener {
             signIn(
                 findViewById<TextView>(R.id.UsernameTextView).text.toString(),
                 findViewById<TextView>(R.id.PasswordTextView).text.toString()
@@ -31,7 +31,7 @@ class LoginPage : AppCompatActivity() {
         }
 
         RegisterButton.setOnClickListener {
-            createAccount(
+            register(
                 findViewById<TextView>(R.id.UsernameTextView).text.toString(),
                 findViewById<TextView>(R.id.PasswordTextView).text.toString()
             )
@@ -46,7 +46,7 @@ class LoginPage : AppCompatActivity() {
         }
     }
 
-    private fun createAccount(email: String, password: String) {
+    private fun register(email: String, password: String) {
         // [START create_user_with_email]
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->

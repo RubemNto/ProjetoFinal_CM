@@ -98,11 +98,11 @@
         app:layout_constraintTop_toBottomOf="@+id/PasswordTextView" />
 
     <Button
-        android:id="@+id/LogInButton"
+        android:id="@+id/SignInButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Log-in"
+        android:text="Sign-in"
 
         app:layout_constraintStart_toStartOf="@+id/PasswordTextView"
         app:layout_constraintTop_toBottomOf="@+id/PasswordTextView" />
