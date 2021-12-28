@@ -1,5 +1,6 @@
 package ipca.project.rpglife
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -46,6 +47,12 @@ class LoginPage : AppCompatActivity() {
         }
     }
 
+    private fun startMainActivity()
+    {
+        val intent = Intent(this@LoginPage,MainActivity::class.java)
+        startActivity(intent)
+    }
+
     private fun register(email: String, password: String) {
         // [START create_user_with_email]
         auth.createUserWithEmailAndPassword(email, password)
@@ -55,6 +62,7 @@ class LoginPage : AppCompatActivity() {
                     Log.d(TAG, "createUserWithEmail:success")
                     val user = auth.currentUser
                     updateUI(user)
+                    startMainActivity()
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "createUserWithEmail:failure", task.exception)
@@ -77,6 +85,7 @@ class LoginPage : AppCompatActivity() {
                     Log.d(TAG, "signInWithEmail:success")
                     val user = auth.currentUser
                     updateUI(user)
+                    startMainActivity()
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInWithEmail:failure", task.exception)
@@ -91,11 +100,9 @@ class LoginPage : AppCompatActivity() {
     }
 
     private fun updateUI(user: FirebaseUser?) {
-        TODO("Not yet implemented")
     }
 
     private fun reload() {
-        TODO("Not yet implemented")
     }
 
     companion object {
