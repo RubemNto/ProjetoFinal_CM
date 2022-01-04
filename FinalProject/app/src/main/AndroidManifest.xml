@@ -13,6 +13,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FinalProject">
+        <activity
+            android:name=".Register"
+            android:exported="false" />
+        <activity
+            android:name=".MapActivity"
+            android:exported="false"
+            android:label="@string/title_activity_map"
+            android:theme="@style/Theme.FinalProject.NoActionBar" />
 
         <meta-data
             android:name="com.google.android.geo.API_Key"

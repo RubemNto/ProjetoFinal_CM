@@ -4,106 +4,95 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
     tools:context=".LoginPage">
 
-    <TextView
-        android:id="@+id/TitleTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/allerta"
-        android:text="RPG\nLIFE"
-        android:textAlignment="center"
-        android:textColor="#8900FF"
-        android:textSize="60sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/textView2"
+
+    <ImageView
+        android:id="@+id/logoImageView"
+        android:layout_width="91dp"
+        android:layout_height="114dp"
+        android:layout_marginBottom="64dp"
+        app:layout_constraintBottom_toTopOf="@+id/EmailTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:srcCompat="@drawable/ic_noun_knight_1943918" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/titleTextVIew"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="92dp"
         android:fontFamily="@font/allerta"
-        android:text="Username"
-        android:textColor="#8900FF"
-        android:textSize="20sp"
-        android:textStyle="bold"
+        android:text="RPG LIFE"
+        android:textColor="@color/black"
+        android:textSize="40dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/logoImageView" />
 
+    <EditText
+        android:id="@+id/EmailTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:fontFamily="@font/allerta"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:fontFamily="@font/allerta"
-        android:text="Password"
-        android:textColor="#8900FF"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/UsernameTextView" />
-
-    <EditText
-        android:id="@+id/UsernameTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/border"
-        android:ems="10"
-        android:hint="email"
-        android:inputType="textEmailAddress"
-
-        android:textColorHint="#350063"
-        android:textColor="#8900FF"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
-
     <EditText
         android:id="@+id/PasswordTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/border"
+        android:layout_marginTop="16dp"
         android:ems="10"
-        android:hint="password"
+        android:fontFamily="@font/allerta"
+        android:hint="Password"
         android:inputType="textEmailAddress"
-
-        android:textColorHint="#FF350063"
-        android:textColor="#8900FF"
-
+        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+        app:layout_constraintTop_toBottomOf="@+id/EmailTextView" />
+
+    <Button
+        android:id="@+id/SignInButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:backgroundTint="@color/black"
+        android:fontFamily="@font/allerta"
+        android:text="Sign in"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/PasswordTextView" />
 
     <Button
         android:id="@+id/RegisterButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-
+        android:backgroundTint="@color/white"
+        android:fontFamily="@font/allerta"
         android:text="Register"
+        android:textColor="#000000"
+        android:textSize="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/warningTextView" />
 
-        app:layout_constraintEnd_toEndOf="@+id/PasswordTextView"
-        app:layout_constraintTop_toBottomOf="@+id/PasswordTextView" />
-
-    <Button
-        android:id="@+id/SignInButton"
+    <TextView
+        android:id="@+id/warningTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Sign-in"
+        android:layout_marginTop="32dp"
+        android:fontFamily="@font/allerta"
+        android:text="Don't have an account?"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/SignInButton" />
 
-        app:layout_constraintStart_toStartOf="@+id/PasswordTextView"
-        app:layout_constraintTop_toBottomOf="@+id/PasswordTextView" />
 </androidx.constraintlayout.widget.ConstraintLayout>

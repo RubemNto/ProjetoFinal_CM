@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Register">
+
+    <EditText
+        android:id="@+id/RegistrationEmailTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:fontFamily="@font/allerta"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/RegistrationPasswordTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:fontFamily="@font/allerta"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/RegistrationEmailTextView" />
+
+    <ImageView
+        android:id="@+id/KnightImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/ic_noun_knight_1943918"
+        app:layout_constraintBottom_toTopOf="@+id/knightTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/VikingImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="16dp"
+        android:src="@drawable/ic_noun_viking_1943923"
+        app:layout_constraintBottom_toTopOf="@+id/vikingTextView"
+        app:layout_constraintStart_toEndOf="@+id/KnightImageView" />
+
+    <ImageView
+        android:id="@+id/WitchImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_noun_witch_1943930"
+        app:layout_constraintBottom_toTopOf="@+id/witchTextView"
+        app:layout_constraintEnd_toStartOf="@+id/KnightImageView" />
+
+    <TextView
+        android:id="@+id/witchTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:fontFamily="@font/allerta"
+        android:text="Witch"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toTopOf="@+id/DescriptionTextView"
+        app:layout_constraintEnd_toEndOf="@+id/WitchImageView"
+        app:layout_constraintStart_toStartOf="@+id/WitchImageView" />
+
+    <TextView
+        android:id="@+id/knightTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:fontFamily="@font/allerta"
+        android:text="Knight"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toTopOf="@+id/DescriptionTextView"
+        app:layout_constraintEnd_toEndOf="@+id/KnightImageView"
+        app:layout_constraintStart_toStartOf="@+id/KnightImageView" />
+
+    <TextView
+        android:id="@+id/vikingTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:fontFamily="@font/allerta"
+        android:text="Viking"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toTopOf="@+id/DescriptionTextView"
+        app:layout_constraintEnd_toEndOf="@+id/VikingImageView"
+        app:layout_constraintStart_toStartOf="@+id/VikingImageView" />
+
+    <TextView
+        android:id="@+id/DescriptionTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        android:fontFamily="@font/allerta"
+        android:text="class description"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toTopOf="@+id/RegistrationEmailTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/RegistrationRegisterButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/black"
+        android:fontFamily="@font/allerta"
+        android:text="Register"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/RegistrationPasswordTextView" />
+
+    <TextView
+        android:id="@+id/TitleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:fontFamily="@font/allerta"
+        android:text="Registration"
+        android:textColor="@color/black"
+        android:textSize="35dp"
+        app:layout_constraintBottom_toTopOf="@+id/KnightImageView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/SelectionKnightImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/ic_baseline_arrow_drop_down_circle_24"
+        app:layout_constraintBottom_toTopOf="@+id/KnightImageView"
+        app:layout_constraintEnd_toEndOf="@+id/KnightImageView"
+        app:layout_constraintStart_toStartOf="@+id/KnightImageView"
+        app:tint="@color/black" />
+
+    <ImageView
+        android:id="@+id/SelectionWitchImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/ic_baseline_arrow_drop_down_circle_24"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/imageView4"
+        app:layout_constraintEnd_toEndOf="@+id/imageView4"
+        app:layout_constraintStart_toStartOf="@+id/imageView4"
+        app:tint="@color/black" />
+
+    <ImageView
+        android:id="@+id/SelectionVikingImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/ic_baseline_arrow_drop_down_circle_24"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/imageView3"
+        app:layout_constraintEnd_toEndOf="@+id/imageView3"
+        app:layout_constraintStart_toStartOf="@+id/imageView3"
+        app:tint="@color/black" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
