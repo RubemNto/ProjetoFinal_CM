@@ -12,10 +12,10 @@ import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 class Register : AppCompatActivity() {
-
     lateinit var knightOption: ImageView
     lateinit var vikingOption: ImageView
     lateinit var witchOption: ImageView
@@ -37,6 +37,7 @@ class Register : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     lateinit var EmailTextView: TextView
     lateinit var PasswordTextView: TextView
+    lateinit var NameTextView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,9 +79,13 @@ class Register : AppCompatActivity() {
 
         EmailTextView = findViewById(R.id.RegistrationEmailTextView)
         PasswordTextView = findViewById(R.id.RegistrationPasswordTextView)
-
+        NameTextView = findViewById(R.id.RegistrationUsernameTextView)
         registerButton.setOnClickListener {
-            createAccount(EmailTextView.text.toString(), PasswordTextView.text.toString())
+            createAccount(
+                EmailTextView.text.toString(),
+                PasswordTextView.text.toString(),
+                NameTextView.text.toString()
+            )
         }
     }
 
@@ -98,7 +103,7 @@ class Register : AppCompatActivity() {
         startActivity(getIntent())
     }
 
-    private fun createAccount(email: String, password: String) {
+    private fun createAccount(email: String, password: String, name: String) {
         // [START create_user_with_email]
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
@@ -106,6 +111,14 @@ class Register : AppCompatActivity() {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "createUserWithEmail:success")
                     val user = auth.currentUser
+                    val db = Firebase.firestore
+                    val userData = hashMapOf(
+                        "Name" to name,
+                        "XP" to 0,
+                        "Steps" to 0,
+                        "Calories" to 0,
+                    )
+                    db.collection("users").document(user?.uid.toString()).set(userData)
                     updateUI(user)
                 } else {
                     // If sign in fails, display a message to the user.
@@ -121,12 +134,11 @@ class Register : AppCompatActivity() {
     }
 
     private fun updateUI(user: FirebaseUser?) {
-        if(user != null){
-            val intent = Intent(this,MapActivity::class.java)
+        if (user != null) {
+            val intent = Intent(this, MapActivity::class.java)
             startActivity(intent)
             finish()
-        }else
-        {
+        } else {
             reload()
         }
     }
