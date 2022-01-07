@@ -14,21 +14,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FinalProject">
         <activity
-            android:name=".Register"
+            android:name=".ProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".MapActivity"
+            android:name=".MainActivity"
             android:exported="false"
-            android:label="@string/title_activity_map"
-            android:theme="@style/Theme.FinalProject.NoActionBar" />
+            android:theme="@style/Theme.FinalProject.AppBar" />
+        <activity
+            android:name=".Register"
+            android:exported="false" />
 
         <meta-data
             android:name="com.google.android.geo.API_Key"
             android:value="@string/map_key" />
 
-        <activity
-            android:name=".MainActivity"
-            android:exported="false" />
         <activity
             android:name=".LoginPage"
             android:exported="true"
