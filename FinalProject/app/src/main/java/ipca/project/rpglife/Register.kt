@@ -14,6 +14,9 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class Register : AppCompatActivity() {
     lateinit var knightOption: ImageView
@@ -112,12 +115,19 @@ class Register : AppCompatActivity() {
                     Log.d(TAG, "createUserWithEmail:success")
                     val user = auth.currentUser
                     val db = Firebase.firestore
+
+                    val c: Calendar = Calendar.getInstance()
+                    val sdf = SimpleDateFormat("dd-MM-yyyy")
+                    val strDate: String = sdf.format(c.time)
                     val userData = hashMapOf(
                         "Name" to name,
                         "XP" to 0,
-                        "Steps" to 0,
                         "Calories" to 0,
-                    )
+                        "TotalSteps" to 0,
+                        "TotalCalories" to 0,
+                        "StartDate" to strDate,
+                        "EndDate" to strDate,
+                        )
                     db.collection("users").document(user?.uid.toString()).set(userData)
                     updateUI(user)
                 } else {
@@ -136,6 +146,7 @@ class Register : AppCompatActivity() {
     private fun updateUI(user: FirebaseUser?) {
         if (user != null) {
             val intent = Intent(this, MainActivity::class.java)
+            intent.putExtra("userID",user.uid.toString())
             startActivity(intent)
             finish()
         } else {

@@ -1,33 +1,27 @@
 package ipca.project.rpglife
 
 class User {
-    var Name: String = "Name"
-    var XP: Float = 0f
-    var Steps: Int = 0
-    var Calories: Float = 0f
+    public var Name: String = "Name"
+    public var XP: Int = 0
+    public var TotalSteps: Int = 0
+    public var Calories: Float = 0f
 
-    var Gold: Int = 0
-    var Rocks: Int = 0
-    var Wood: Int = 0
-    var Leather: Int = 0
+    public lateinit var StartDate : String
+    public lateinit var EndDate : String
 
     constructor(
         name: String,
-        xp: Float,
-        steps: Int,
+        xp: Int,
+        totalSteps: Int,
         calories: Float,
-        gold: Int,
-        rocks: Int,
-        wood: Int,
-        leather: Int
+        startDate:String,
+        endDate:String,
     ){
         Name = name
         XP = xp
-        Steps = steps
+        TotalSteps = totalSteps
         Calories = calories
-        Gold = gold
-        Rocks = rocks
-        Wood = wood
-        Leather = leather
+        StartDate = startDate
+        EndDate = endDate
     }
 }
