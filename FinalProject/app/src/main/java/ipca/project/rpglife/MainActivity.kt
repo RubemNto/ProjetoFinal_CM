@@ -32,6 +32,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 import android.R.attr.delay
 import android.os.Handler
+import android.view.View
+import android.widget.ImageView
 
 import android.widget.Toast
 
@@ -39,12 +41,14 @@ import android.widget.Toast
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     var handler: Handler = Handler()
+    var handlerEnemy: Handler = Handler()
     var runnable: Runnable? = null
+    var runnableEnemy: Runnable? = null
     var delay = 1000
-
+    var delayShowEnemy = 45000
+    var animals = arrayListOf<ImageView>()
     lateinit var user: User
     var userID: String? = null
-//    private lateinit var binding: ActivityMapsBinding
 
     //google maps variables
     private var map: GoogleMap? = null
@@ -56,10 +60,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        animals.add(findViewById(R.id.bearImageView))
+        animals.add(findViewById(R.id.deerImageView))
+        animals.add(findViewById(R.id.wolfImageView))
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-
-//        binding = ActivityMapsBinding.inflate(layoutInflater)
-//        setContentView(binding.root)
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map2) as SupportMapFragment
@@ -97,6 +101,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             }
     }
 
+    var randomPosition: Int = 0
+    var randomAnimal: Int = 0
     override fun onResume() {
         handler.postDelayed(Runnable {
             runnable?.let { handler.postDelayed(it, delay.toLong()) }
@@ -105,12 +111,21 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 getDeviceLocation()
             }
         }.also { runnable = it }, delay.toLong())
+
+        handlerEnemy.postDelayed(Runnable {
+            runnableEnemy?.let { handler.postDelayed(it, delayShowEnemy.toLong()) }
+            randomPosition = Random().nextInt(3)
+            randomAnimal = Random().nextInt(3)
+            animals[randomPosition].visibility = View.VISIBLE
+            animals[randomPosition].setImageResource(animals[randomAnimal].tag as Int)
+        }.also { runnable = it }, delayShowEnemy.toLong())
         super.onResume()
     }
 
     override fun onPause() {
         super.onPause()
         runnable?.let { handler.removeCallbacks(it) } //stop handler when activity not visible super.onPause();
+        runnableEnemy?.let { handlerEnemy.removeCallbacks(it) } //stop handler when activity not visible super.onPause();
     }
 
     override fun onMapReady(googleMap: GoogleMap) {

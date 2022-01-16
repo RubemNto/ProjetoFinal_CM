@@ -40,7 +40,7 @@
         android:id="@+id/KnightImageView"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:src="@drawable/ic_noun_knight_1943918"
+        android:src="@drawable/barbarian"
         app:layout_constraintBottom_toTopOf="@+id/knightTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -50,7 +50,7 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginStart="16dp"
-        android:src="@drawable/ic_noun_viking_1943923"
+        android:src="@drawable/warrior"
         app:layout_constraintBottom_toTopOf="@+id/vikingTextView"
         app:layout_constraintStart_toEndOf="@+id/KnightImageView" />
 
@@ -59,7 +59,7 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginEnd="16dp"
-        android:src="@drawable/ic_noun_witch_1943930"
+        android:src="@drawable/rogue"
         app:layout_constraintBottom_toTopOf="@+id/witchTextView"
         app:layout_constraintEnd_toStartOf="@+id/KnightImageView" />
 
@@ -69,7 +69,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
         android:fontFamily="@font/allerta"
-        android:text="Witch"
+        android:text="Rogue"
         android:textColor="@color/black"
         app:layout_constraintBottom_toTopOf="@+id/DescriptionTextView"
         app:layout_constraintEnd_toEndOf="@+id/WitchImageView"
@@ -81,7 +81,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
         android:fontFamily="@font/allerta"
-        android:text="Knight"
+        android:text="Barbarian"
         android:textColor="@color/black"
         app:layout_constraintBottom_toTopOf="@+id/DescriptionTextView"
         app:layout_constraintEnd_toEndOf="@+id/KnightImageView"

@@ -22,13 +22,13 @@ class ProfileActivity : AppCompatActivity() {
 
         when (intent.getStringExtra("userClass")) {
             "0" -> {
-        ProfilePictureImageView.setImageResource(R.drawable.ic_noun_witch_1943930)
+        ProfilePictureImageView.setImageResource(R.drawable.rogue)
             }
             "1" -> {
-        ProfilePictureImageView.setImageResource(R.drawable.ic_noun_knight_1943918)
+        ProfilePictureImageView.setImageResource(R.drawable.barbarian)
             }
             else -> {
-        ProfilePictureImageView.setImageResource(R.drawable.ic_noun_viking_1943923)
+        ProfilePictureImageView.setImageResource(R.drawable.warrior)
             }
         }
 

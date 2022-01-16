@@ -42,7 +42,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_percent="0.25"
-        app:srcCompat="@drawable/ic_noun_knight_1943918" />
+        app:srcCompat="@drawable/barbarian" />
 
     <ImageView
         android:id="@+id/imageView2"
@@ -132,7 +132,7 @@
         android:id="@+id/UsernameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="15dp"
+        android:layout_marginBottom="0dp"
         android:fontFamily="@font/allerta"
         android:text="username"
         android:textColor="@color/black"
