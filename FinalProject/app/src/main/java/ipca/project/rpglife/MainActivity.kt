@@ -1,53 +1,71 @@
 package ipca.project.rpglife
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
-import android.graphics.Color
+import android.content.pm.PackageManager
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.TextView
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import ipca.project.rpglife.databinding.ActivityMapsBinding
-import android.content.Context;
-import android.content.pm.PackageManager
 import org.json.JSONObject
 import org.json.JSONException
 
 import org.json.JSONTokener
 import java.text.SimpleDateFormat
 import java.util.*
-import android.location.LocationListener
 
-import android.location.LocationManager
-import android.view.View
-import androidx.core.app.ActivityCompat
-
-
-class MainActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback, SensorEventListener {
 
     lateinit var user: User
     var userID: String? = null
-    private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
 
-    protected var locationManager: LocationManager? = null
-    protected var locationListener: LocationListener? = null
-    private  var lat: Double = 0.0
-    private  var lon: Double = 0.0
+    private var sensorManager: SensorManager? = null
+    private var running = false
+    private var totalSteps = 0f
+    private var previousTotalSteps = 0f
+
+    //google maps varaibles
+    private var map: GoogleMap? = null
+    lateinit var placesClient: PlacesClient
+    lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private val defaultLocation = LatLng(41.1579, -8.6291)
+    private var locationPermissionGranted = false
+    private var lastKnownLocation: Location? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        loadData()
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        // Construct a PlacesClient
+        Places.initialize(applicationContext, getString(R.string.maps_api_key))
+        placesClient = Places.createClient(this)
+        // Construct a FusedLocationProviderClient.
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
         binding = ActivityMapsBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -57,38 +75,18 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-
-        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager?
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return
-        }
-        locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER,2000,10f,this)
-
-        var db = Firebase.firestore
+        val db = Firebase.firestore
         userID = intent.getStringExtra("userID")
         val docRef = userID?.let { db.collection("users").document(it) }
         docRef?.get()
             ?.addOnSuccessListener { document ->
                 if (document != null) {
                     Log.d("TAG", "DocumentSnapshot data: ${document.data}")
-                    user = parseUserJsonData(document.data.toString());
+                    user = parseUserJsonData(document.data.toString())
                     val c: Calendar = Calendar.getInstance()
                     val sdf = SimpleDateFormat("dd-MMM-yyyy")
                     val userData = hashMapOf(
+                        "UserClass" to user.UserClass,
                         "Name" to user.Name,
                         "XP" to user.XP,
                         "Calories" to user.Calories,
@@ -109,13 +107,23 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
             }
     }
 
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
+    override fun onResume() {
+        super.onResume()
+        running = true
+        val stepSensor: Sensor? = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+        if (stepSensor == null) {
+            Toast.makeText(this, "no sensor detected", Toast.LENGTH_SHORT).show()
+        } else {
+            sensorManager?.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_UI)
+        }
+    }
 
-        // Add a marker in Sydney and move the camera
-        val position = LatLng(lat, lon)
-        mMap.addMarker(MarkerOptions().position(position).title("User's current position"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position,15f))
+    override fun onMapReady(googleMap: GoogleMap) {
+        map = googleMap
+        // Turn on the My Location layer and the related control on the map.
+        updateLocationUI()
+        // Get the current location of the device and set the position of the map.
+        getDeviceLocation()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -128,11 +136,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         return when (item.itemId) {
             R.id.Profile -> {
                 val intent = Intent(this@MainActivity, ProfileActivity::class.java)
-                intent.putExtra("username",user.Name)
-                intent.putExtra("steps",user.TotalSteps.toString())
-                intent.putExtra("calories",user.Calories.toString())
-                intent.putExtra("startDate",user.StartDate)
-                intent.putExtra("endDate",user.EndDate)
+                intent.putExtra("userClass",user.UserClass.toString())
+                intent.putExtra("username", user.Name)
+                intent.putExtra("steps", user.TotalSteps.toString())
+                intent.putExtra("calories", user.Calories.toString())
+                intent.putExtra("startDate", user.StartDate)
+                intent.putExtra("endDate", user.EndDate)
                 startActivity(intent)
                 true
             }
@@ -140,10 +149,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         }
     }
 
-    private fun parseUserJsonData(result : String) : User {
+    private fun parseUserJsonData(result: String): User {
         try {
             val json = JSONTokener(result).nextValue() as JSONObject
-            var NewUser: User = User(
+            val NewUser = User(
+                json["UserClass"].toString().toInt(),
                 json["Name"].toString(),
                 json["XP"].toString().toInt(),
                 json["TotalSteps"].toString().toInt(),
@@ -155,23 +165,151 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         } catch (e: JSONException) {
             e.printStackTrace()
         }
-        return User("Name",0,0,0f,"00/00/0000","00/00/0000")
+        return User(0, "Name", 0, 0, 0f, "00/00/0000", "00/00/0000")
     }
 
-    override fun onLocationChanged(p0: Location) {
-        lat = p0.latitude
-        lon = p0.longitude
+    @SuppressLint("MissingPermission")
+    private fun getDeviceLocation() {
+        /*
+         * Get the best and most recent location of the device, which may be null in rare
+         * cases when a location is not available.
+         */
+        try {
+            if (locationPermissionGranted) {
+                val locationResult = fusedLocationProviderClient.lastLocation
+                locationResult.addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        // Set the map's camera position to the current location of the device.
+                        lastKnownLocation = task.result
+                        if (lastKnownLocation != null) {
+                            map?.moveCamera(
+                                CameraUpdateFactory.newLatLngZoom(
+                                    LatLng(
+                                        lastKnownLocation!!.latitude,
+                                        lastKnownLocation!!.longitude
+                                    ), DEFAULT_ZOOM.toFloat()
+                                )
+                            )
+                            updateLocationUI()
+                        }
+                    } else {
+                        Log.d(TAG, "Current location is null. Using defaults.")
+                        Log.e(TAG, "Exception: %s", task.exception)
+                        map?.moveCamera(
+                            CameraUpdateFactory
+                                .newLatLngZoom(defaultLocation, DEFAULT_ZOOM.toFloat())
+                        )
+                        map?.uiSettings?.isMyLocationButtonEnabled = false
+                    }
+                }
+            }
+        } catch (e: SecurityException) {
+            Log.e("Exception: %s", e.message, e)
+        }
     }
 
-    override fun onProviderDisabled(provider: String) {
-        Log.d("Latitude", "disable")
+    private fun getLocationPermission() {
+        /*
+         * Request location permission, so that we can get the location of the
+         * device. The result of the permission request is handled by a callback,
+         * onRequestPermissionsResult.
+         */
+        if (ContextCompat.checkSelfPermission(
+                this.applicationContext,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            locationPermissionGranted = true
+        } else {
+            ActivityCompat.requestPermissions(
+                this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION
+            )
+        }
     }
 
-    override fun onProviderEnabled(provider: String) {
-        Log.d("Latitude", "enable")
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        locationPermissionGranted = false
+        when (requestCode) {
+            PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION -> {
+
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.isNotEmpty() &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED
+                ) {
+                    locationPermissionGranted = true
+                }
+            }
+        }
+        updateLocationUI()
     }
 
-    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
-        Log.d("Latitude", "status")
+    @SuppressLint("MissingPermission")
+    private fun updateLocationUI() {
+        if (map == null) {
+            return
+        }
+        try {
+            if (locationPermissionGranted) {
+                map?.isMyLocationEnabled = true
+                map?.uiSettings?.isMyLocationButtonEnabled = true
+            } else {
+                map?.isMyLocationEnabled = false
+                map?.uiSettings?.isMyLocationButtonEnabled = false
+                lastKnownLocation = null
+                getLocationPermission()
+            }
+        } catch (e: SecurityException) {
+            Log.e("Exception: %s", e.message, e)
+        }
+    }
+
+    companion object {
+        private const val DEFAULT_ZOOM = 15
+        private const val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
+        private val TAG = "Something"
+
+        // Keys for storing activity state.
+        private const val KEY_CAMERA_POSITION = "camera_position"
+        private const val KEY_LOCATION = "location"
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        if (running) {
+            totalSteps = event!!.values[0]
+            val currentSteps = totalSteps.toInt() - previousTotalSteps.toInt()
+            Log.d("changed value", "{$currentSteps}")
+            //change value on screen of total steps taken on the day
+        }
+    }
+
+    override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
+        TODO("Not yet implemented")
+    }
+
+    private fun resetSteps() {
+        previousTotalSteps = totalSteps
+        saveData()
+    }
+
+    private fun saveData() {
+        //this allows the program to store data into phone
+        val sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putFloat("key1", previousTotalSteps)
+        editor.apply()
+    }
+
+    private fun loadData() {
+        val sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
+        val savedNumber = sharedPreferences.getFloat("key1", 0f)
+        Log.d("MainActivity", "${savedNumber}")
+        previousTotalSteps = savedNumber
     }
 }

@@ -23,6 +23,8 @@ class Register : AppCompatActivity() {
     lateinit var vikingOption: ImageView
     lateinit var witchOption: ImageView
 
+    private var userClass = 1
+
     lateinit var checkDotKnight: ImageView
     lateinit var checkDotViking: ImageView
     lateinit var checkDotWitch: ImageView
@@ -57,11 +59,20 @@ class Register : AppCompatActivity() {
         classDescription = findViewById(R.id.DescriptionTextView)
         classDescription.text = classesDescriptions[1]
 
+        witchOption.setOnClickListener {
+            classDescription.text = classesDescriptions[0]
+            checkDotWitch.visibility = View.VISIBLE
+            checkDotKnight.visibility = View.INVISIBLE
+            checkDotViking.visibility = View.INVISIBLE
+            userClass = 0
+        }
+
         knightOption.setOnClickListener {
             classDescription.text = classesDescriptions[1]
             checkDotKnight.visibility = View.VISIBLE
             checkDotViking.visibility = View.INVISIBLE
             checkDotWitch.visibility = View.INVISIBLE
+            userClass = 1
         }
 
         vikingOption.setOnClickListener {
@@ -69,14 +80,9 @@ class Register : AppCompatActivity() {
             checkDotViking.visibility = View.VISIBLE
             checkDotKnight.visibility = View.INVISIBLE
             checkDotWitch.visibility = View.INVISIBLE
+            userClass = 2
         }
 
-        witchOption.setOnClickListener {
-            classDescription.text = classesDescriptions[0]
-            checkDotWitch.visibility = View.VISIBLE
-            checkDotKnight.visibility = View.INVISIBLE
-            checkDotViking.visibility = View.INVISIBLE
-        }
 
         registerButton = findViewById(R.id.RegistrationRegisterButton)
 
@@ -120,6 +126,7 @@ class Register : AppCompatActivity() {
                     val sdf = SimpleDateFormat("dd-MMM-yyyy")
                     val strDate: String = sdf.format(c.time)
                     val userData = hashMapOf(
+                        "UserClass" to userClass,
                         "Name" to name,
                         "XP" to 0,
                         "Calories" to 0,

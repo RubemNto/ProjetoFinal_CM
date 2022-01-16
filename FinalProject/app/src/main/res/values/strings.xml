@@ -4,4 +4,5 @@
     <string name="tab_text_1">Map</string>
     <string name="tab_text_2">Rank</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="maps_api_key">AIzaSyBeO7QRG5a_XLbNjGyJiXBcXfccKp4QSn8</string>
 </resources>
