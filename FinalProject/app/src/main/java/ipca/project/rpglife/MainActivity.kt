@@ -2,9 +2,11 @@ package ipca.project.rpglife
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.job.JobService
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -24,6 +26,9 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.CircleOptions
+import com.google.android.gms.maps.model.GroundOverlayOptions
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.PlacesClient
@@ -36,21 +41,16 @@ import org.json.JSONException
 import org.json.JSONTokener
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.log
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback, SensorEventListener {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     lateinit var user: User
     var userID: String? = null
     private lateinit var binding: ActivityMapsBinding
 
-    private var sensorManager: SensorManager? = null
-    private var running = false
-    private var totalSteps = 0f
-    private var previousTotalSteps = 0f
-
-    //google maps varaibles
+    //google maps variables
     private var map: GoogleMap? = null
-    lateinit var placesClient: PlacesClient
     lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private val defaultLocation = LatLng(41.1579, -8.6291)
     private var locationPermissionGranted = false
@@ -59,11 +59,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, SensorEventListene
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        loadData()
-        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        // Construct a PlacesClient
-        Places.initialize(applicationContext, getString(R.string.maps_api_key))
-        placesClient = Places.createClient(this)
         // Construct a FusedLocationProviderClient.
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -71,8 +66,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, SensorEventListene
         setContentView(binding.root)
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
         val db = Firebase.firestore
@@ -107,17 +101,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, SensorEventListene
             }
     }
 
-    override fun onResume() {
-        super.onResume()
-        running = true
-        val stepSensor: Sensor? = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-        if (stepSensor == null) {
-            Toast.makeText(this, "no sensor detected", Toast.LENGTH_SHORT).show()
-        } else {
-            sensorManager?.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_UI)
-        }
-    }
-
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         // Turn on the My Location layer and the related control on the map.
@@ -136,9 +119,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, SensorEventListene
         return when (item.itemId) {
             R.id.Profile -> {
                 val intent = Intent(this@MainActivity, ProfileActivity::class.java)
-                intent.putExtra("userClass",user.UserClass.toString())
+                intent.putExtra("userClass", user.UserClass.toString())
                 intent.putExtra("username", user.Name)
-                intent.putExtra("steps", user.TotalSteps.toString())
+                intent.putExtra("steps", user.TotalSteps)
                 intent.putExtra("calories", user.Calories.toString())
                 intent.putExtra("startDate", user.StartDate)
                 intent.putExtra("endDate", user.EndDate)
@@ -190,6 +173,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, SensorEventListene
                                     ), DEFAULT_ZOOM.toFloat()
                                 )
                             )
+
                             updateLocationUI()
                         }
                     } else {
@@ -278,38 +262,5 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, SensorEventListene
         // Keys for storing activity state.
         private const val KEY_CAMERA_POSITION = "camera_position"
         private const val KEY_LOCATION = "location"
-    }
-
-    override fun onSensorChanged(event: SensorEvent?) {
-        if (running) {
-            totalSteps = event!!.values[0]
-            val currentSteps = totalSteps.toInt() - previousTotalSteps.toInt()
-            Log.d("changed value", "{$currentSteps}")
-            //change value on screen of total steps taken on the day
-        }
-    }
-
-    override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
-        TODO("Not yet implemented")
-    }
-
-    private fun resetSteps() {
-        previousTotalSteps = totalSteps
-        saveData()
-    }
-
-    private fun saveData() {
-        //this allows the program to store data into phone
-        val sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putFloat("key1", previousTotalSteps)
-        editor.apply()
-    }
-
-    private fun loadData() {
-        val sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
-        val savedNumber = sharedPreferences.getFloat("key1", 0f)
-        Log.d("MainActivity", "${savedNumber}")
-        previousTotalSteps = savedNumber
     }
 }
