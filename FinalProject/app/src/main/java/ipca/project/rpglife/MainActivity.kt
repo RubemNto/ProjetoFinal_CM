@@ -2,22 +2,14 @@ package ipca.project.rpglife
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.job.JobService
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
 import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -26,12 +18,8 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.CircleOptions
-import com.google.android.gms.maps.model.GroundOverlayOptions
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.libraries.places.api.Places
-import com.google.android.libraries.places.api.net.PlacesClient
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import ipca.project.rpglife.databinding.ActivityMapsBinding
@@ -41,13 +29,12 @@ import org.json.JSONException
 import org.json.JSONTokener
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.log
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     lateinit var user: User
     var userID: String? = null
-    private lateinit var binding: ActivityMapsBinding
+//    private lateinit var binding: ActivityMapsBinding
 
     //google maps variables
     private var map: GoogleMap? = null
@@ -59,14 +46,13 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        // Construct a FusedLocationProviderClient.
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
-        binding = ActivityMapsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+//        binding = ActivityMapsBinding.inflate(layoutInflater)
+//        setContentView(binding.root)
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.map2) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
         val db = Firebase.firestore
@@ -103,6 +89,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
+        map?.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.map_style))
+        map!!.setMinZoomPreference(10f)
+        map!!.setMaxZoomPreference(DEFAULT_ZOOM.toFloat())
         // Turn on the My Location layer and the related control on the map.
         updateLocationUI()
         // Get the current location of the device and set the position of the map.
@@ -135,7 +124,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun parseUserJsonData(result: String): User {
         try {
             val json = JSONTokener(result).nextValue() as JSONObject
-            val NewUser = User(
+            return User(
                 json["UserClass"].toString().toInt(),
                 json["Name"].toString(),
                 json["XP"].toString().toInt(),
@@ -144,7 +133,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 json["StartDate"].toString(),
                 json["EndDate"].toString()
             )
-            return NewUser
         } catch (e: JSONException) {
             e.printStackTrace()
         }
@@ -153,10 +141,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     @SuppressLint("MissingPermission")
     private fun getDeviceLocation() {
-        /*
-         * Get the best and most recent location of the device, which may be null in rare
-         * cases when a location is not available.
-         */
         try {
             if (locationPermissionGranted) {
                 val locationResult = fusedLocationProviderClient.lastLocation
@@ -193,11 +177,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun getLocationPermission() {
-        /*
-         * Request location permission, so that we can get the location of the
-         * device. The result of the permission request is handled by a callback,
-         * onRequestPermissionsResult.
-         */
         if (ContextCompat.checkSelfPermission(
                 this.applicationContext,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -222,7 +201,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         locationPermissionGranted = false
         when (requestCode) {
             PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION -> {
-
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.isNotEmpty() &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED
@@ -242,7 +220,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         try {
             if (locationPermissionGranted) {
                 map?.isMyLocationEnabled = true
+                map?.uiSettings?.isCompassEnabled = true
                 map?.uiSettings?.isMyLocationButtonEnabled = true
+                map?.uiSettings?.isMapToolbarEnabled = true
             } else {
                 map?.isMyLocationEnabled = false
                 map?.uiSettings?.isMyLocationButtonEnabled = false
