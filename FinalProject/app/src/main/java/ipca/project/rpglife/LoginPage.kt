@@ -80,7 +80,7 @@ class LoginPage : AppCompatActivity() {
     private fun updateUI(user: FirebaseUser?) {
         if (user != null) {
             val intent = Intent(this,MainActivity::class.java)
-            intent.putExtra("userID",user.uid.toString())
+            intent.putExtra("userID",user.uid)
             startActivity(intent)
             finish()
         } else {

@@ -142,7 +142,7 @@
         app:layout_constraintStart_toStartOf="@+id/ProfilePictureImageView" />
 
     <TextView
-        android:id="@+id/FromDateTextView"
+        android:id="@+id/StartDateTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/allerta"
@@ -156,7 +156,7 @@
         app:layout_constraintTop_toTopOf="@+id/imageView9" />
 
     <TextView
-        android:id="@+id/ToDateTextView"
+        android:id="@+id/EndDateTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/allerta"

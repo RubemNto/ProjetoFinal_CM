@@ -117,14 +117,13 @@ class Register : AppCompatActivity() {
                     val db = Firebase.firestore
 
                     val c: Calendar = Calendar.getInstance()
-                    val sdf = SimpleDateFormat("dd-MM-yyyy")
+                    val sdf = SimpleDateFormat("dd-MMM-yyyy")
                     val strDate: String = sdf.format(c.time)
                     val userData = hashMapOf(
                         "Name" to name,
                         "XP" to 0,
                         "Calories" to 0,
                         "TotalSteps" to 0,
-                        "TotalCalories" to 0,
                         "StartDate" to strDate,
                         "EndDate" to strDate,
                         )
