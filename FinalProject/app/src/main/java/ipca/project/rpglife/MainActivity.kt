@@ -1,6 +1,7 @@
 package ipca.project.rpglife
 
 import android.Manifest
+import android.R.attr
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -29,8 +30,17 @@ import org.json.JSONException
 import org.json.JSONTokener
 import java.text.SimpleDateFormat
 import java.util.*
+import android.R.attr.delay
+import android.os.Handler
+
+import android.widget.Toast
+
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
+
+    var handler: Handler = Handler()
+    var runnable: Runnable? = null
+    var delay = 1000
 
     lateinit var user: User
     var userID: String? = null
@@ -87,9 +97,25 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             }
     }
 
+    override fun onResume() {
+        handler.postDelayed(Runnable {
+            runnable?.let { handler.postDelayed(it, delay.toLong()) }
+            if (map != null) {
+                updateLocationUI()
+                getDeviceLocation()
+            }
+        }.also { runnable = it }, delay.toLong())
+        super.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        runnable?.let { handler.removeCallbacks(it) } //stop handler when activity not visible super.onPause();
+    }
+
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
-        map?.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.map_style))
+        map?.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_style))
         map!!.setMinZoomPreference(10f)
         map!!.setMaxZoomPreference(DEFAULT_ZOOM.toFloat())
         // Turn on the My Location layer and the related control on the map.
@@ -157,7 +183,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                                     ), DEFAULT_ZOOM.toFloat()
                                 )
                             )
-
                             updateLocationUI()
                         }
                     } else {
@@ -220,9 +245,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         try {
             if (locationPermissionGranted) {
                 map?.isMyLocationEnabled = true
-                map?.uiSettings?.isCompassEnabled = true
-                map?.uiSettings?.isMyLocationButtonEnabled = true
-                map?.uiSettings?.isMapToolbarEnabled = true
+                map?.uiSettings?.isMyLocationButtonEnabled = false
+                map?.uiSettings?.isRotateGesturesEnabled = false
+                map?.uiSettings?.isScrollGesturesEnabled = false
             } else {
                 map?.isMyLocationEnabled = false
                 map?.uiSettings?.isMyLocationButtonEnabled = false
