@@ -210,6 +210,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, SensorEventListene
         if (running) {
             totalSteps = event!!.values[0]
             val currentSteps = totalSteps.toInt() - previousTotalSteps.toInt()
+            user.XP+=currentSteps
             WalkValueTextView.text = currentSteps.toInt().toString()
             CaloriesTextView.text = (currentSteps * 0.1f).toString()
         }
@@ -235,8 +236,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, SensorEventListene
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         map?.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_style))
-        map!!.setMinZoomPreference(10f)
+        map?.uiSettings?.isZoomControlsEnabled = false
+        map?.uiSettings?.isZoomGesturesEnabled = false
+        map!!.setMinZoomPreference(DEFAULT_ZOOM.toFloat())
         map!!.setMaxZoomPreference(DEFAULT_ZOOM.toFloat())
+
         // Turn on the My Location layer and the related control on the map.
         updateLocationUI()
         // Get the current location of the device and set the position of the map.
