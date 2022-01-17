@@ -25,14 +25,14 @@
         android:layout_marginTop="-8dp"
         android:layout_marginEnd="-16dp"
         android:layout_marginBottom="-8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView6"
-        app:layout_constraintEnd_toEndOf="@+id/imageView6"
-        app:layout_constraintStart_toStartOf="@+id/textView5"
-        app:layout_constraintTop_toTopOf="@+id/imageView6"
+        app:layout_constraintBottom_toBottomOf="@+id/walkImageView"
+        app:layout_constraintEnd_toEndOf="@+id/walkImageView"
+        app:layout_constraintStart_toStartOf="@+id/WalkValueTextView"
+        app:layout_constraintTop_toTopOf="@+id/walkImageView"
         app:srcCompat="@drawable/rounded_square" />
 
     <ImageView
-        android:id="@+id/imageView6"
+        android:id="@+id/walkImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginEnd="32dp"
@@ -44,16 +44,16 @@
         app:srcCompat="@drawable/ic_person_walking" />
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/WalkValueTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:fontFamily="@font/allerta"
         android:text="99"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView6"
-        app:layout_constraintEnd_toStartOf="@+id/imageView6"
-        app:layout_constraintTop_toTopOf="@+id/imageView6" />
+        app:layout_constraintBottom_toBottomOf="@+id/walkImageView"
+        app:layout_constraintEnd_toStartOf="@+id/walkImageView"
+        app:layout_constraintTop_toTopOf="@+id/walkImageView" />
 
     <ImageView
         android:id="@+id/imageView4"
@@ -64,7 +64,7 @@
         android:layout_marginEnd="-16dp"
         android:layout_marginBottom="-8dp"
         app:layout_constraintBottom_toBottomOf="@+id/imageView"
-        app:layout_constraintEnd_toEndOf="@+id/textView"
+        app:layout_constraintEnd_toEndOf="@+id/CaloriesTextView"
         app:layout_constraintStart_toStartOf="@+id/imageView"
         app:layout_constraintTop_toTopOf="@+id/imageView"
         app:srcCompat="@drawable/rounded_square" />
@@ -82,7 +82,7 @@
         app:srcCompat="@drawable/ic_fire_flame_curved" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/CaloriesTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -133,5 +133,59 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintWidth_percent="0.1"
         app:srcCompat="@drawable/deer" />
+
+    <ImageView
+        android:id="@+id/imageView6"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="-16dp"
+        android:layout_marginTop="-16dp"
+        android:layout_marginEnd="-16dp"
+        android:layout_marginBottom="-16dp"
+        app:layout_constraintBottom_toBottomOf="@+id/XPTextView"
+        app:layout_constraintEnd_toEndOf="@+id/FutureLevelTextView"
+        app:layout_constraintStart_toStartOf="@+id/CurrentLevelTextView"
+        app:layout_constraintTop_toTopOf="@+id/XPTextView"
+        app:srcCompat="@drawable/rounded_square" />
+
+    <TextView
+        android:id="@+id/XPTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:fontFamily="@font/allerta"
+        android:text="100%"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/map2" />
+
+    <TextView
+        android:id="@+id/FutureLevelTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="32dp"
+        android:fontFamily="@font/allerta"
+        android:text="1"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/XPTextView"
+        app:layout_constraintTop_toTopOf="@+id/map2" />
+
+    <TextView
+        android:id="@+id/CurrentLevelTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="24dp"
+        android:fontFamily="@font/allerta"
+        android:text="0"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/XPTextView"
+        app:layout_constraintTop_toTopOf="@+id/map2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

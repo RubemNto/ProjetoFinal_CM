@@ -23,32 +23,52 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import ipca.project.rpglife.databinding.ActivityMapsBinding
 import org.json.JSONObject
 import org.json.JSONException
 
 import org.json.JSONTokener
 import java.text.SimpleDateFormat
 import java.util.*
-import android.R.attr.delay
+import android.content.Context
+import android.graphics.drawable.Drawable
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.os.Handler
 import android.view.View
 import android.widget.ImageView
-
+import android.widget.TextView
 import android.widget.Toast
+import com.google.firebase.firestore.FirebaseFirestore
 
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback, SensorEventListener {
 
     var handler: Handler = Handler()
-    var handlerEnemy: Handler = Handler()
     var runnable: Runnable? = null
-    var runnableEnemy: Runnable? = null
-    var delay = 1000
-    var delayShowEnemy = 45000
+
+    var delay = 10000
+    var createAnimal = true
     var animals = arrayListOf<ImageView>()
+    var animalsDrawables = arrayListOf<Drawable>()
+
+    //user variables
     lateinit var user: User
     var userID: String? = null
+    lateinit var db: FirebaseFirestore
+
+    //user step counter variables
+    var sensorManager: SensorManager? = null
+    var running = false
+    var totalSteps = 0f
+    var previousTotalSteps = 0f
+    lateinit var WalkValueTextView: TextView
+    lateinit var CaloriesTextView: TextView
+
+    lateinit var XPTextView:TextView
+    lateinit var CurrentLevelTextView:TextView
+    lateinit var FutureLevelTextView:TextView
 
     //google maps variables
     private var map: GoogleMap? = null
@@ -60,16 +80,29 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         animals.add(findViewById(R.id.bearImageView))
+        animalsDrawables.add(animals[0].drawable)
         animals.add(findViewById(R.id.deerImageView))
+        animalsDrawables.add(animals[1].drawable)
         animals.add(findViewById(R.id.wolfImageView))
+        animalsDrawables.add(animals[2].drawable)
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        WalkValueTextView = findViewById(R.id.WalkValueTextView)
+        CaloriesTextView = findViewById(R.id.CaloriesTextView)
 
+        XPTextView = findViewById(R.id.XPTextView)
+        CurrentLevelTextView = findViewById(R.id.CurrentLevelTextView)
+        FutureLevelTextView = findViewById(R.id.FutureLevelTextView)
+
+        loadData()
+        WalkValueTextView.text = 0.toString()
+        CaloriesTextView.text = 0.toString()
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map2) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        val db = Firebase.firestore
+        db = Firebase.firestore
         userID = intent.getStringExtra("userID")
         val docRef = userID?.let { db.collection("users").document(it) }
         docRef?.get()
@@ -77,6 +110,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 if (document != null) {
                     Log.d("TAG", "DocumentSnapshot data: ${document.data}")
                     user = parseUserJsonData(document.data.toString())
+
+                    CurrentLevelTextView.text = (user.XP/100).toString()
+                    FutureLevelTextView.text = (user.XP/100 + 1).toString()
+                    XPTextView.text = (user.XP - CurrentLevelTextView.text.toString().toInt()*100).toString() + "%"
                     val c: Calendar = Calendar.getInstance()
                     val sdf = SimpleDateFormat("dd-MMM-yyyy")
                     val userData = hashMapOf(
@@ -101,8 +138,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             }
     }
 
-    var randomPosition: Int = 0
-    var randomAnimal: Int = 0
     override fun onResume() {
         handler.postDelayed(Runnable {
             runnable?.let { handler.postDelayed(it, delay.toLong()) }
@@ -110,22 +145,91 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 updateLocationUI()
                 getDeviceLocation()
             }
+            if (createAnimal) {
+                var randomPosition = Random().nextInt(3)
+                var randomAnimal = Random().nextInt(3)
+                animals[randomPosition].visibility = View.VISIBLE
+                animals[randomPosition].isClickable = true
+                animals[randomPosition].setOnClickListener {
+                    user?.XP += 5
+                    CurrentLevelTextView.text = (user.XP/100).toString()
+                    FutureLevelTextView.text = (user.XP/100 + 1).toString()
+                    XPTextView.text = (user.XP - CurrentLevelTextView.text.toString().toInt()*100).toString() + "%"
+                    val docRef = userID?.let { db.collection("users").document(it) }
+                    docRef?.get()
+                        ?.addOnSuccessListener { document ->
+                            if (document != null) {
+                                Log.d("TAG", "DocumentSnapshot data: ${document.data}")
+                                val c: Calendar = Calendar.getInstance()
+                                val sdf = SimpleDateFormat("dd-MMM-yyyy")
+                                val userData = hashMapOf(
+                                    "UserClass" to user.UserClass,
+                                    "Name" to user.Name,
+                                    "XP" to user.XP,
+                                    "Calories" to user.Calories,
+                                    "TotalSteps" to user.TotalSteps,
+                                    "StartDate" to user.StartDate,
+                                    "EndDate" to sdf.format(c.time),
+                                )
+                                //update information into the user document in the firebase database
+                                userID?.let { id ->
+                                    db.collection("users").document(id).set(userData)
+                                }
+                                //change the users current date of usage to the next time the app is successfully opened
+                                user.EndDate = sdf.format(c.time)
+                            } else {
+                                Log.d("TAG", "No such document")
+                            }
+                        }
+                        ?.addOnFailureListener { exception ->
+                            Log.d("TAG", "get failed with ", exception)
+                        }
+                    createAnimal = true
+                    animals[randomPosition].visibility = View.GONE
+                }
+                animals[randomPosition].setImageDrawable(animalsDrawables[randomAnimal])
+                createAnimal = false
+            }
         }.also { runnable = it }, delay.toLong())
-
-        handlerEnemy.postDelayed(Runnable {
-            runnableEnemy?.let { handler.postDelayed(it, delayShowEnemy.toLong()) }
-            randomPosition = Random().nextInt(3)
-            randomAnimal = Random().nextInt(3)
-            animals[randomPosition].visibility = View.VISIBLE
-            animals[randomPosition].setImageResource(animals[randomAnimal].tag as Int)
-        }.also { runnable = it }, delayShowEnemy.toLong())
         super.onResume()
+        running = true
+        val stepSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+        if (stepSensor == null) {
+            Toast.makeText(this, "No step counter detected", Toast.LENGTH_SHORT).show()
+        } else {
+            sensorManager?.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_FASTEST)
+        }
     }
 
     override fun onPause() {
         super.onPause()
         runnable?.let { handler.removeCallbacks(it) } //stop handler when activity not visible super.onPause();
-        runnableEnemy?.let { handlerEnemy.removeCallbacks(it) } //stop handler when activity not visible super.onPause();
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        if (running) {
+            totalSteps = event!!.values[0]
+            val currentSteps = totalSteps.toInt() - previousTotalSteps.toInt()
+            WalkValueTextView.text = currentSteps.toInt().toString()
+            CaloriesTextView.text = (currentSteps * 0.1f).toString()
+        }
+    }
+
+    override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
+    }
+
+    private fun saveData() {
+        val sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putFloat("key1", previousTotalSteps)
+        editor.apply()
+    }
+
+    private fun loadData() {
+        val sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
+        val savedNumber = sharedPreferences.getFloat("key1", 0f)
+        Log.d("MainActivity", "$savedNumber")
+        previousTotalSteps = savedNumber
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -149,10 +253,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         return when (item.itemId) {
             R.id.Profile -> {
                 val intent = Intent(this@MainActivity, ProfileActivity::class.java)
+                intent.putExtra("userID",userID)
                 intent.putExtra("userClass", user.UserClass.toString())
                 intent.putExtra("username", user.Name)
-                intent.putExtra("steps", user.TotalSteps)
-                intent.putExtra("calories", user.Calories.toString())
+                intent.putExtra("steps", (user.TotalSteps + WalkValueTextView.text.toString().toInt()).toString())
+                intent.putExtra("calories", (user.Calories + CaloriesTextView.text.toString().toInt()).toString())
                 intent.putExtra("startDate", user.StartDate)
                 intent.putExtra("endDate", user.EndDate)
                 startActivity(intent)
